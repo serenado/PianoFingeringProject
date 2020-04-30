@@ -5,7 +5,6 @@ import constants
 TODO: introduce pruning to only keep best fingerings?
 TODO: favor fingerings that start on 1, end on 5 for ascending, start on 5, end on 1 for descending?
 TODO: may need a better way of associating fingers to notes
-TODO: average scores over notes?
 '''
 def finger_monotonic(notes):
 	'''
@@ -23,9 +22,9 @@ def finger_monotonic(notes):
 		distance = note.pitch.ps - prev_note.pitch.ps
 		color = get_color(note)
 		if distance >= 0:
-			finger_pairs = constants.COMFORT[(abs(distance), prev_color, color)]
+			finger_pairs = constants.COMFORT[(distance, prev_color, color)]
 		else:
-			finger_pairs = constants.COMFORT[(abs(distance), color, prev_color)]
+			finger_pairs = constants.COMFORT[(-distance, color, prev_color)]
 
 
 		# for each partial fingering, try possible next fingers
@@ -44,7 +43,8 @@ def finger_monotonic(notes):
 		prev_note = note
 		prev_color = color
 	
-	return sorted(fingerings, key=lambda x: x[1], reverse=True)
+	fingerings = [(f[0], f[1] / (len(notes) - 1)) for f in fingerings]
+	return sorted(fingerings, key=lambda f: f[1], reverse=True)
 
 def get_color(note):
 	if note.pitch.pitchClass in [0, 2, 4, 5, 7, 9, 11]:
@@ -117,6 +117,6 @@ def test_get_color():
 # test_f_maj_scale_up()
 
 # test_c_maj_scale_down()
-# test_b_maj_scale_down()
+test_b_maj_scale_down()
 # test_c_sharp_maj_scale_down()
 # test_f_maj_scale_down()

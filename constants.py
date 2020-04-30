@@ -22,13 +22,23 @@ is not included, it is assumed to have a comfort score of 0.
 Comfort scores are subjective, based on our own experience playing piano. In general, the 
 following principles are followed:
 
-	- Thumbs on black keys have lower scores
-	- Crossing the thumb under the ring finger or pinky has a low score
-	- Crossing the thumb under is only permissible for small distances
-	- Using the same finger twice in a row has a low score, unless the distance is 0
-	- The more the distance between fingers aligns with distance, the higher the score
+	- Thumbs on black keys have lower scores.
+	- Crossing the thumb under the ring finger or pinky has a low score.
+	- Crossing the thumb under is only permissible for small distances.
+	- Using the same finger twice in a row has a low score, unless the distance is 0.
+	- The more the distance between fingers aligns with distance, the higher the score.
 	- Some intervals map to the same scores, such as (1, 'white', 'white) (i.e. E to F) and 
-		(2, 'white', 'white') (i.e. C to D) since the keys have the same physical distance
+		(2, 'white', 'white') (i.e. C to D) since the keys have the same physical distance.
+
+Future work:
+
+	- Because we assume that comfort is unaffected by direction, we disallow fingerings
+	  take advantage of sliding ones finger from a black key to a white key, as such
+	  maneuvers are only valid in one direction.
+	- These comfort scores are for playing notes consecutively, and do not necessarily 
+	  carry over to playing two notes simultaneously. As such, our algorithm ignores
+	  chords and replaces them with their highest note. In the future, we could explore
+	  how to finger isolated chords, and then chords in the context of a piece of music.
 '''
 COMFORT = {
 	(0, 'white', 'white'): {
