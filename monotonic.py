@@ -105,11 +105,73 @@ def test_c_sharp_maj_scale_down():
 	print(len(fingerings))
 	print(fingerings[:3])
 
+def test_c_maj_arpeggio_up():
+	c_maj_arpeggio = converter.parse('./data/arpeggios/cmaj.mxl')
+	fingerings = finger_monotonic(c_maj_arpeggio.parts[0].flat.notes[:7])
+	print(len(fingerings))
+	print(fingerings[:5])
+
+def test_a_maj_arpeggio_up():
+	a_maj_arpeggio = converter.parse('./data/arpeggios/amaj.mxl')
+	fingerings = finger_monotonic(a_maj_arpeggio.parts[0].flat.notes[:7])
+	print(len(fingerings))
+	print(fingerings[:3])
+
+def test_b_maj_arpeggio_up():
+	b_maj_arpeggio = converter.parse('./data/arpeggios/bmaj.mxl')
+	fingerings = finger_monotonic(b_maj_arpeggio.parts[0].flat.notes[:7])
+	print(len(fingerings))
+	print(fingerings[:3])
+
+def test_c_sharp_maj_arpeggio_up():
+	c_sharp_maj_arpeggio = converter.parse('./data/arpeggios/csharpmaj.mxl')
+	fingerings = finger_monotonic(c_sharp_maj_arpeggio.parts[0].flat.notes[:7])
+	print(len(fingerings))
+	print(fingerings[:5])
+
+def test_b_flat_min_arpeggio_up():
+	b_flat_min_arpeggio = converter.parse('./data/arpeggios/bflatmin.mxl')
+	fingerings = finger_monotonic(b_flat_min_arpeggio.parts[0].flat.notes[:7])
+	print(len(fingerings))
+	print(fingerings[:3])
+
+def test_c_maj_arpeggio_down():
+	c_maj_arpeggio = converter.parse('./data/arpeggios/cmaj.mxl')
+	fingerings = finger_monotonic(c_maj_arpeggio.parts[0].flat.notes[6:])
+	print(len(fingerings))
+	print(fingerings[:5])
+
+def test_a_maj_arpeggio_down():
+	a_maj_arpeggio = converter.parse('./data/arpeggios/amaj.mxl')
+	fingerings = finger_monotonic(a_maj_arpeggio.parts[0].flat.notes[6:])
+	print(len(fingerings))
+	print(fingerings[:3])
+
+def test_b_maj_arpeggio_down():
+	b_maj_arpeggio = converter.parse('./data/arpeggios/bmaj.mxl')
+	fingerings = finger_monotonic(b_maj_arpeggio.parts[0].flat.notes[6:])
+	print(len(fingerings))
+	print(fingerings[:3])
+
+def test_c_sharp_maj_arpeggio_down():
+	c_sharp_maj_arpeggio = converter.parse('./data/arpeggios/csharpmaj.mxl')
+	fingerings = finger_monotonic(c_sharp_maj_arpeggio.parts[0].flat.notes[6:])
+	print(len(fingerings))
+	print(fingerings[:5])
+
+def test_b_flat_min_arpeggio_down():
+	b_flat_min_arpeggio = converter.parse('./data/arpeggios/bflatmin.mxl')
+	fingerings = finger_monotonic(b_flat_min_arpeggio.parts[0].flat.notes[6:])
+	print(len(fingerings))
+	print(fingerings[:3])
+
 def test_get_color():
 	assert(get_color(note.Note('C4')) == 'white')
 	assert(get_color(note.Note('C#4')) == 'black')
 
 # test_get_color()
+
+# SCALES
 
 # test_c_maj_scale_up()
 # test_b_maj_scale_up()
@@ -117,6 +179,20 @@ def test_get_color():
 # test_f_maj_scale_up()
 
 # test_c_maj_scale_down()
-test_b_maj_scale_down()
+# test_b_maj_scale_down()
 # test_c_sharp_maj_scale_down()
 # test_f_maj_scale_down()
+
+# ARPEGGIOS
+
+# test_c_maj_arpeggio_up()
+# test_a_maj_arpeggio_up()
+# test_b_maj_arpeggio_up()
+# test_c_sharp_maj_arpeggio_up()
+# test_b_flat_min_arpeggio_up()
+
+# test_c_maj_arpeggio_down()
+# test_a_maj_arpeggio_down()
+# test_b_maj_arpeggio_down()
+# test_c_sharp_maj_arpeggio_down()
+test_b_flat_min_arpeggio_down()
