@@ -1,5 +1,6 @@
 from music21 import *
 import constants
+import copy
 
 '''
 TODO: introduce pruning to only keep best fingerings?
@@ -50,6 +51,17 @@ def get_color(note):
 	if note.pitch.pitchClass in [0, 2, 4, 5, 7, 9, 11]:
 		return 'white'
 	return 'black'
+
+def annotate_score(score, fingering, offset=0):
+	'''
+	Makes a new score by adding fingering numbers according to a array of fingerings.
+	If offset if specified, starts adding fingering after offset number of notes
+	from the beginning of the score.
+	'''
+	new_score = copy.deepcopy(score)
+	for i in range(len(fingering)):
+		score.flat.notes[i+offset].articulations.append(articulations.Fingering(fingering[i]))
+	return score
 
 ################################################################################
 #																			   #
@@ -169,6 +181,18 @@ def test_get_color():
 	assert(get_color(note.Note('C4')) == 'white')
 	assert(get_color(note.Note('C#4')) == 'black')
 
+def show_c_maj_scale_up():
+	c_maj_scale = converter.parse('./data/scales/cmaj.mxl')
+	fingerings = finger_monotonic(c_maj_scale.parts[0].flat.notes[:15])
+	new_score = annotate_score(c_maj_scale.parts[0], fingerings[0][0])
+	new_score.show()
+
+def show_c_sharp_maj_scale_down():
+	c_sharp_maj_scale = converter.parse('./data/scales/csharpmaj.mxl')
+	fingerings = finger_monotonic(c_sharp_maj_scale.parts[0].flat.notes[14:])
+	new_score = annotate_score(c_sharp_maj_scale.parts[0], fingerings[0][0], offset=14)
+	new_score.show()
+
 # test_get_color()
 
 # SCALES
@@ -195,4 +219,8 @@ def test_get_color():
 # test_a_maj_arpeggio_down()
 # test_b_maj_arpeggio_down()
 # test_c_sharp_maj_arpeggio_down()
-test_b_flat_min_arpeggio_down()
+# test_b_flat_min_arpeggio_down()
+
+# show_c_maj_scale_up()
+# show_c_sharp_maj_scale_down()
+
