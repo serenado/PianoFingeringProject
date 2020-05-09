@@ -2,11 +2,16 @@ import monotonic
 import copy
 from music21 import *
 
-def split(part, rh=True):
+def split(part, rh=True, rest_flag=-1):
     '''
     Split a given piano part (for a single hand) into ascending and descending chunks.
     Returns a list of lists each representing a monotonic chunk of notes.
     Adjacent chunks share a note.
+
+    rest_flag is used to decide which (if any) rests should be used as moments to split into a chunk.
+    If rest_flag is -1, rests will not be used as rests.
+    If rest_flag > 0, rest_flag represents the number of quarter notes necessary for a rest to be
+    used as a reset.
     
     As an example, Mary Had a Little Lamb would be split like so:
         input: EDCDEEEDDDEGGEDCDEEEEDDDEDC
@@ -15,8 +20,7 @@ def split(part, rh=True):
     Currently, our algorithm is not able to provide fingering for chords. If the part contains
     chords, they will be replaced by a single note from that chord. If rh is True, we choose
     the top note. Otherwise, we choose the bottom note.
-        
-    TODO: long enough rests should signify a break where the hand can be reset to any finger
+    
     '''
     chunks = []
     note_1 = part.flat.notes[0]
@@ -32,12 +36,27 @@ def split(part, rh=True):
         else:
             note_2 = note_2.notes[0] # set current note to lowest note in chord
     current_chunk = [note_1, note_2]
-    is_ascending = current_chunk[1].pitch.ps >= current_chunk[1].pitch.ps           # true if the 2nd note is weakly higher than 1st note
+    is_ascending = current_chunk[1].pitch.ps >= current_chunk[0].pitch.ps           # true if the 2nd note is weakly higher than 1st note
 
-    for i in range(2, len(part.flat.notes)):
+    for i in range(2, len(part.flat.notesAndRests)):
         prev_note = current_chunk[-1]
-        current_note = part.flat.notes[i]
-        if isinstance(current_note, chord.Chord):
+        current_note = part.flat.notesAndRests[i]
+
+        if isinstance(current_note, note.Rest):     
+            if i == len(part.flat.notesAndRests)-1:         # if part ends on rest
+                break
+
+            if rest_flag != -1 and current_note.duration.quarterLength >= rest_flag:
+                if len(current_chunk) != 1:
+                    chunks.append(current_chunk)
+
+                current_chunk = [prev_note]
+                # Assumes ascending, changes later if this guess is wrong
+                is_ascending = True        
+            continue
+
+
+        elif isinstance(current_note, chord.Chord):
             if rh:
                 current_note = current_note.notes[-1] # set current note to highest note in chord
             else:
@@ -45,6 +64,10 @@ def split(part, rh=True):
         if is_ascending:
             if current_note.pitch.ps >= prev_note.pitch.ps:
                 current_chunk.append(current_note)
+            elif len(current_chunk) == 1:
+                # if we just left a chord and guessed incorrectly
+                current_chunk.append(current_note)
+                is_ascending = False
             else:
                 # switch to descending now                               
                 chunks.append(current_chunk)
@@ -61,23 +84,23 @@ def split(part, rh=True):
     chunks.append(current_chunk)
     return chunks
 
-def finger_both(score):
+def finger_both(score, rest_flag=-1):
     '''
     Given a piano score, returns a score with annotated fingerings for both hands.
     '''
-    annotated_rh = finger(score.parts[0])
-    annotated_lh = finger(score.parts[1], False)
+    annotated_rh = finger(score.parts[0], rest_flag=rest_flag)
+    annotated_lh = finger(score.parts[1], False, rest_flag=rest_flag)
 
     annotated_score = copy.deepcopy(score)
 
     return annotated_score
 
-def finger(score, rh=True):
+def finger(score, rh=True, rest_flag=-1):
     '''
     Given a single-hand piano score, returns a score with an annotated fingering. If rh is True, generate
     a right-handed fingering. Otherwise, generate a left-handed fingering.
     '''    
-    chunks = split(score, rh)
+    chunks = split(score, rh, rest_flag=rest_flag)
 
     # keep memo tables to avoid repeat calculations
     memo_table = dict() 
@@ -189,8 +212,15 @@ def test_k545():
     result = finger_both(k545)
     result.show()
 
+def test_k545_with_split():
+    k545 = corpus.parse('mozart/k545')
+    result = finger_both(k545,rest_flag=1.0)
+    result.show()
+
+
 # test_c_maj_scale()
 # test_c_maj_arpeggio()
 # test_c_maj_arpeggio()
 # test_bwv108_soprano()
-test_k545()
+# test_k545()
+test_k545_with_split()
