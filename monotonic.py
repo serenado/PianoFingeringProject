@@ -20,7 +20,7 @@ def finger_monotonic(notes, rh=True):
 	for note in notes[1:]:
 		new_fingerings = []
 
-		distance = min(note.pitch.ps - prev_note.pitch.ps, 13) # CLAMP DOWN TO 13
+		distance = max(min(note.pitch.ps - prev_note.pitch.ps, 13), -13) # CLAMP DOWN TO 13
 		color = get_color(note)
 		if rh:
 			if distance >= 0:

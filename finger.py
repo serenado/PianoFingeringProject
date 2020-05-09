@@ -19,7 +19,19 @@ def split(part, rh=True):
     TODO: long enough rests should signify a break where the hand can be reset to any finger
     '''
     chunks = []
-    current_chunk = [part.flat.notes[0], part.flat.notes[1]]
+    note_1 = part.flat.notes[0]
+    if isinstance(note_1, chord.Chord):
+        if rh:
+            note_w = note_w.notes[-1] # set current note to highest note in chord
+        else:
+            note_w = note_w.notes[0] # set current note to lowest note in chord
+    note_2 = part.flat.notes[1]
+    if isinstance(note_2, chord.Chord):
+        if rh:
+            note_2 = note_2.notes[-1] # set current note to highest note in chord
+        else:
+            note_2 = note_2.notes[0] # set current note to lowest note in chord
+    current_chunk = [note_1, note_2]
     is_ascending = current_chunk[1].pitch.ps >= current_chunk[1].pitch.ps           # true if the 2nd note is weakly higher than 1st note
 
     for i in range(2, len(part.flat.notes)):
@@ -177,10 +189,8 @@ def test_k545():
     result = finger_both(k545)
     result.show()
 
-
 # test_c_maj_scale()
 # test_c_maj_arpeggio()
 # test_c_maj_arpeggio()
 # test_bwv108_soprano()
 test_k545()
-
