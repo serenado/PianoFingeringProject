@@ -2,17 +2,21 @@ from music21 import *
 import constants
 import copy
 
-'''
-TODO: introduce pruning to only keep best fingerings?
-TODO: favor fingerings that start on 1, end on 5 for ascending, start on 5, end on 1 for descending?
-TODO: may need a better way of associating fingers to notes
-'''
 def finger_monotonic(notes, rh=True):
 	'''
-	Given a monotonic list of notes (either ascending or descending), produces a list of
+	Given a monotonic list of Notes (either ascending or descending), produces a list of
 	potential fingerings, with a comfort score for each.
 	
-	TODO: what data structure?
+	If rh is True, produces fingerings for the right hand. Otherwise, produces fingerings
+	for the left hand.
+
+	Returns a list of tuples (fingering, score) where fingering is a list of fingers
+	(ints from 1 to 5) with the same length as notes and score is the average comfort
+	of note transitions.
+
+	Future work:
+		- Replace BFS with a more efficient algorithm
+		- Tailor algorithm to take advantage of monotonicity
 	'''
 	fingerings = [([1], 0), ([2], 0), ([3], 0), ([4], 0), ([5], 0)]
 	prev_note = notes[0]
@@ -53,13 +57,17 @@ def finger_monotonic(notes, rh=True):
 	return sorted(fingerings, key=lambda f: f[1], reverse=True)
 
 def get_color(note):
+	'''
+	Given a Note object, returns 'white' if the corresponding piano key is white
+	and 'black' otherwise.
+	'''
 	if note.pitch.pitchClass in [0, 2, 4, 5, 7, 9, 11]:
 		return 'white'
 	return 'black'
 
 def annotate_score(score, fingering, offset=0, rh=True):
 	'''
-	Makes a new score by adding fingering numbers according to a array of fingerings.
+	Makes a new score by adding fingering numbers according to an array of fingerings.
 	If offset if specified, starts adding fingering after offset number of notes
 	from the beginning of the score.
 
@@ -262,6 +270,7 @@ def show_c_sharp_maj_scale_down():
 # test_c_sharp_maj_arpeggio_down()
 # test_b_flat_min_arpeggio_down()
 
+# ANNOTATE SCORE
+
 # show_c_maj_scale_up()
 # show_c_sharp_maj_scale_down()
-

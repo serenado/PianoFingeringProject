@@ -1,42 +1,39 @@
 '''
-Variables storing comfort scores for fingerings of two notes.
+Variable storing comfort scores for fingerings of two notes.
 
-Should have a score for each combination:
-	(finger 1, finger 2, distance, color 1, color 2) where distance is in half steps.
+Should have a score from 1 to 10 for each combination:
+	(distance, color 1, color 2, finger 1, finger 2) where distance is in half steps
+		and fingers are for the right hand.
 
-For example, (1, 2, 3, 'white', 'black') corresponds to the comfort score of playing
+For example, (3, 'white', 'black', 1, 2) corresponds to the comfort score of playing
 a thumb on a white key, say C4, and an index finger on a black key three half steps 
 above, say E-4.
 
 Note that distance is always positive, indicating an ascending interval. We assume that
 comfort is unaffected by direction, that is, 1 on C followed by 2 on E is as comfortable
-as 2 on E followed by 1 on C. Currently, distance ranges from 0 to 12 (an octave).
+as 2 on E followed by 1 on C. Currently, distance ranges from 0 to 12 (an octave). We
+also assume symmetry between hands.
 
 Also note that finger pairings such as (3, 1) are included. This represents the thumb
 crossing under the middle finger.
 
 The scores are organized as a two layer dictionary. The outer layer specifies the step size
 and colors of keys, and the inner layer specifies the finger pairing. If the finger pair
-is not included, it is assumed to have a comfort score of 0.
+is not included, it is deemed an unacceptable fingering and will never appear in a fingering
+produced by our algorithm. Note that this means it is possible to construct songs with no
+valid fingerings, if they require movements that we have deemed unacceptable.
 
 Comfort scores are subjective, based on our own experience playing piano. In general, the 
 following principles are followed:
 
 	- Thumbs on black keys have lower scores.
-	- Crossing the thumb under the ring finger or pinky has a low score.
+	- Crossing the thumb under the pinky is unacceptable.
 	- Crossing the thumb under is only permissible for small distances.
-	- Using the same finger twice in a row has a low score, unless the distance is 0.
+	- Using the same finger twice in a row is unacceptable, unless the distance is 0.
 	- The more the distance between fingers aligns with distance, the higher the score.
-
-Future work:
-
-	- Because we assume that comfort is unaffected by direction, we disallow fingerings
-	  take advantage of sliding ones finger from a black key to a white key, as such
-	  maneuvers are only valid in one direction.
-	- These comfort scores are for playing notes consecutively, and do not necessarily 
-	  carry over to playing two notes simultaneously. As such, our algorithm ignores
-	  chords and replaces them with their highest note. In the future, we could explore
-	  how to finger isolated chords, and then chords in the context of a piece of music.
+	- For intervals with the same physical distance but different half-step distances,
+		comfort scores should be the same. For example, C4 and E4 have the same physical
+		distance as D4 and F4, but more half steps between them.
 '''
 COMFORT = {
 	(0, 'white', 'white'): {

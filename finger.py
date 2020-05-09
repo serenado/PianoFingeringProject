@@ -223,4 +223,4 @@ def test_k545_with_split():
 # test_c_maj_arpeggio()
 # test_bwv108_soprano()
 # test_k545()
-test_k545_with_split()
+# test_k545_with_split()
