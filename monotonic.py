@@ -18,14 +18,17 @@ def finger_monotonic(notes, rh=True):
 		- Replace BFS with a more efficient algorithm
 		- Tailor algorithm to take advantage of monotonicity
 	'''
+	# initialize with all possible fingers on the first note
 	fingerings = [([1], 0), ([2], 0), ([3], 0), ([4], 0), ([5], 0)]
 	prev_note = notes[0]
 	prev_color = get_color(prev_note)
+
 	for note in notes[1:]:
 		new_fingerings = []
 
 		distance = max(min(note.pitch.ps - prev_note.pitch.ps, 13), -13) # CLAMP DOWN TO 13
 		color = get_color(note)
+		# get valid finger pairs from the comfort score table
 		if rh:
 			if distance >= 0:
 				finger_pairs = constants.COMFORT[(distance, prev_color, color)]
@@ -45,6 +48,8 @@ def finger_monotonic(notes, rh=True):
 					finger_pair = (prev_finger, finger)
 				else:
 					finger_pair = (finger, prev_finger)
+
+				# if finger transition is valid, add to new fingerings and update score
 				if finger_pair in finger_pairs:
 					comfort_score = finger_pairs[finger_pair]
 					new_fingerings.append((fingering + [finger], score + comfort_score))
@@ -53,6 +58,7 @@ def finger_monotonic(notes, rh=True):
 		prev_note = note
 		prev_color = color
 	
+	# calculate average comfort score for each fingering
 	fingerings = [(f[0], f[1] / (len(notes) - 1)) for f in fingerings]
 	return sorted(fingerings, key=lambda f: f[1], reverse=True)
 
@@ -76,6 +82,7 @@ def annotate_score(score, fingering, offset=0, rh=True):
 	'''
 	new_score = copy.deepcopy(score)
 	for i in range(len(fingering)):
+		# replace chords with a single Note, top note if right hand, else bottom note
 		if isinstance(score.flat.notes[i+offset], chord.Chord):
 			if rh:
 				index = -1
