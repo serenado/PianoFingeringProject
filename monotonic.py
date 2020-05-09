@@ -7,7 +7,7 @@ TODO: introduce pruning to only keep best fingerings?
 TODO: favor fingerings that start on 1, end on 5 for ascending, start on 5, end on 1 for descending?
 TODO: may need a better way of associating fingers to notes
 '''
-def finger_monotonic(notes):
+def finger_monotonic(notes, rh=True):
 	'''
 	Given a monotonic list of notes (either ascending or descending), produces a list of
 	potential fingerings, with a comfort score for each.
@@ -20,19 +20,24 @@ def finger_monotonic(notes):
 	for note in notes[1:]:
 		new_fingerings = []
 
-		distance = note.pitch.ps - prev_note.pitch.ps
+		distance = min(note.pitch.ps - prev_note.pitch.ps, 13) # CLAMP DOWN TO 13
 		color = get_color(note)
-		if distance >= 0:
-			finger_pairs = constants.COMFORT[(distance, prev_color, color)]
+		if rh:
+			if distance >= 0:
+				finger_pairs = constants.COMFORT[(distance, prev_color, color)]
+			else:
+				finger_pairs = constants.COMFORT[(-distance, color, prev_color)]
 		else:
-			finger_pairs = constants.COMFORT[(-distance, color, prev_color)]
-
+			if distance >= 0:
+				finger_pairs = constants.COMFORT[(distance, color, prev_color)]
+			else:
+				finger_pairs = constants.COMFORT[(-distance, prev_color, color)]
 
 		# for each partial fingering, try possible next fingers
 		for fingering, score in fingerings:
 			prev_finger = fingering[-1]
 			for finger in [1, 2, 3, 4, 5]:
-				if distance >= 0:
+				if (rh and distance >= 0) or (not rh and distance < 0):
 					finger_pair = (prev_finger, finger)
 				else:
 					finger_pair = (finger, prev_finger)
@@ -52,14 +57,23 @@ def get_color(note):
 		return 'white'
 	return 'black'
 
-def annotate_score(score, fingering, offset=0):
+def annotate_score(score, fingering, offset=0, rh=True):
 	'''
 	Makes a new score by adding fingering numbers according to a array of fingerings.
 	If offset if specified, starts adding fingering after offset number of notes
 	from the beginning of the score.
+
+	Replaces chords with a single note. If rh is True, chooses the top note. Otherwise,
+	chooses the bottom note.
 	'''
 	new_score = copy.deepcopy(score)
 	for i in range(len(fingering)):
+		if isinstance(score.flat.notes[i+offset], chord.Chord):
+			if rh:
+				index = -1
+			else:
+				index = 0
+			score.flat.notes[i+offset].activeSite.replace(score.flat.notes[i+offset], score.flat.notes[i+offset].notes[index])
 		score.flat.notes[i+offset].articulations.append(articulations.Fingering(fingering[i]))
 	return score
 
@@ -90,6 +104,30 @@ def test_f_maj_scale_up():
 def test_c_sharp_maj_scale_up():
 	c_sharp_maj_scale = converter.parse('./data/scales/csharpmaj.mxl')
 	fingerings = finger_monotonic(c_sharp_maj_scale.parts[0].flat.notes[:15])
+	print(len(fingerings))
+	print(fingerings[:3])
+
+def test_c_maj_scale_up_lh():
+	c_maj_scale = converter.parse('./data/scales/cmaj.mxl')
+	fingerings = finger_monotonic(c_maj_scale.parts[1].flat.notes[:15], False)
+	print(len(fingerings))
+	print(fingerings[:3])
+
+def test_b_maj_scale_up_lh():
+	b_maj_scale = converter.parse('./data/scales/bmaj.mxl')
+	fingerings = finger_monotonic(b_maj_scale.parts[1].flat.notes[:15], False)
+	print(len(fingerings))
+	print(fingerings[:3])
+
+def test_f_maj_scale_up_lh():
+	f_maj_scale = converter.parse('./data/scales/fmaj.mxl')
+	fingerings = finger_monotonic(f_maj_scale.parts[1].flat.notes[:15], False)
+	print(len(fingerings))
+	print(fingerings[:3])
+
+def test_c_sharp_maj_scale_up_lh():
+	c_sharp_maj_scale = converter.parse('./data/scales/csharpmaj.mxl')
+	fingerings = finger_monotonic(c_sharp_maj_scale.parts[1].flat.notes[:15], False)
 	print(len(fingerings))
 	print(fingerings[:3])
 
@@ -201,6 +239,9 @@ def show_c_sharp_maj_scale_down():
 # test_b_maj_scale_up()
 # test_c_sharp_maj_scale_up()
 # test_f_maj_scale_up()
+
+# test_c_maj_scale_up_lh()
+# test_b_maj_scale_up_lh()
 
 # test_c_maj_scale_down()
 # test_b_maj_scale_down()

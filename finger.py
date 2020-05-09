@@ -1,7 +1,8 @@
 import monotonic
+import copy
 from music21 import *
 
-def split(part):
+def split(part, rh=True):
     '''
     Split a given piano part (for a single hand) into ascending and descending chunks.
     Returns a list of lists each representing a monotonic chunk of notes.
@@ -10,6 +11,10 @@ def split(part):
     As an example, Mary Had a Little Lamb would be split like so:
         input: EDCDEEEDDDEGGEDCDEEEEDDDEDC
         output: EDC, CDEEE, EDDD, DEGG, GEDC, CDEEEE, EDDD, DE, EDC
+
+    Currently, our algorithm is not able to provide fingering for chords. If the part contains
+    chords, they will be replaced by a single note from that chord. If rh is True, we choose
+    the top note. Otherwise, we choose the bottom note.
         
     TODO: long enough rests should signify a break where the hand can be reset to any finger
     '''
@@ -20,6 +25,11 @@ def split(part):
     for i in range(2, len(part.flat.notes)):
         prev_note = current_chunk[-1]
         current_note = part.flat.notes[i]
+        if isinstance(current_note, chord.Chord):
+            if rh:
+                current_note = current_note.notes[-1] # set current note to highest note in chord
+            else:
+                current_note = current_note.notes[0] # set current note to lowest note in chord
         if is_ascending:
             if current_note.pitch.ps >= prev_note.pitch.ps:
                 current_chunk.append(current_note)
@@ -39,11 +49,23 @@ def split(part):
     chunks.append(current_chunk)
     return chunks
 
-def finger(score):
+def finger_both(score):
     '''
-    Given a right-hand piano score, returns a score with an annotated fingering.
+    Given a piano score, returns a score with annotated fingerings for both hands.
+    '''
+    annotated_rh = finger(score.parts[0])
+    annotated_lh = finger(score.parts[1], False)
+
+    annotated_score = copy.deepcopy(score)
+
+    return annotated_score
+
+def finger(score, rh=True):
+    '''
+    Given a single-hand piano score, returns a score with an annotated fingering. If rh is True, generate
+    a right-handed fingering. Otherwise, generate a left-handed fingering.
     '''    
-    chunks = split(score)
+    chunks = split(score, rh)
 
     # keep memo tables to avoid repeat calculations
     memo_table = dict() 
@@ -54,18 +76,18 @@ def finger(score):
 
     # try ending on every finger
     for j in range(1, 6):
-        fingering, points = compute_best_score(chunks, len(chunks) - 1, j, memo_table, transition_table)
+        fingering, points = compute_best_score(chunks, len(chunks) - 1, j, memo_table, transition_table, rh)
         if points > best_score:
             best_score = points
             best_fingering = fingering
 
-    annotated_score = monotonic.annotate_score(score, best_fingering)
+    annotated_score = monotonic.annotate_score(score, best_fingering, rh=rh)
 
     print( best_score / (len(chunks) * 10))
     return annotated_score
 
 
-def compute_best_score(chunks, i, j, memo_table, transition_table):
+def compute_best_score(chunks, i, j, memo_table, transition_table, rh=True):
     '''
     Computes best score for all chunks up to chunks[i] where chunk i ends with finger j
     Returns (fingering, total score)
@@ -76,14 +98,14 @@ def compute_best_score(chunks, i, j, memo_table, transition_table):
     if i in transition_table:
         transition_score = transition_table[i]
     else:
-        transition_score = TransitionScores(chunks[i])
+        transition_score = TransitionScores(chunks[i], rh)
         transition_table[i] = transition_score
 
     # base case
     if i == 0:
         # find best starting finger
         best_start = max(possible_fingers, key=lambda start: transition_score.get_fingering_option(start, j)[1])
-        fingering, score = transition_score.get_fingering_option( best_start, j)
+        fingering, score = transition_score.get_fingering_option(best_start, j)
         memo_table[(i, j)] = fingering, score
         return (fingering, score)
 
@@ -95,7 +117,7 @@ def compute_best_score(chunks, i, j, memo_table, transition_table):
         if (i-1, e) in memo_table:
             prev_fingering, prev_score = memo_table[(i-1, e)]
         else:
-            prev_fingering, prev_score = compute_best_score(chunks, i-1, e, memo_table, transition_table)
+            prev_fingering, prev_score = compute_best_score(chunks, i-1, e, memo_table, transition_table, rh)
         possible_fingering, possible_score = transition_score.get_fingering_option(e, j)
 
         # if this new fingering works, update
@@ -107,9 +129,9 @@ def compute_best_score(chunks, i, j, memo_table, transition_table):
     return (fingering, score)
 
 class TransitionScores:
-    def __init__(self,  chunk):
+    def __init__(self,  chunk, rh=True):
         self.chunk = chunk
-        self.fingerings = monotonic.finger_monotonic(self.chunk)
+        self.fingerings = monotonic.finger_monotonic(self.chunk, rh)
 
     def get_fingering_option(self, start_finger, end_finger):
         '''
@@ -150,11 +172,15 @@ def test_bwv108_soprano():
     result = finger(bach.parts[0])
     result.show()
 
+def test_k545():
+    k545 = corpus.parse('mozart/k545')
+    result = finger_both(k545)
+    result.show()
+
 
 # test_c_maj_scale()
 # test_c_maj_arpeggio()
 # test_c_maj_arpeggio()
-test_bwv108_soprano()
-
-
+# test_bwv108_soprano()
+test_k545()
 
