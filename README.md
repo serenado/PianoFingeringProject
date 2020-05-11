@@ -10,7 +10,24 @@ discuss past work maybe?
 
 ## Our Approach
 
-comfort scores, algorithm, etc. maybe split this into subsections?
+The algorithm overview:
+1. Create table of comfort scores for a pair of notes
+2. Split each part into smaller chunks
+3. Generate potential fingerings for each chunk
+4. Stitch chunks together and find the most comfortable fingering
+
+### Comfort scores and monotonic fingering
+
+
+### Splitting and dynamic programming
+Scores were first pre-processed in order to remove chord tones because the algorithm currently cannot handle chords. For the left hand, we removed all tones except for the lowest note. For the right hand, we kept the highest note. These parts were then split into ascending and descending chunks. Adjacent chunks share a transition note which is the local maxima or minima in pitch space. 
+
+To give more fingering options when rests are present in the score, users have the option of specifying if rests should be used as chunk splits. There is a flag that determines if rests should be ignored or specifies the minimum length rest (in quarter beats) for a rest to be used as a chunk split. The ability to specify a minimum rest length accounts for the fact that tempo affects how a pianist can reset during rests. 
+
+[k545_chunks]: img/k545_chunks.png
+In the following excerpt from Piano Sonata No. 16 in C major, K. 545, by Mozart, ascending chunks are blue and descending chunks are orange. Rests with duration greater than 1 quarter beat were used as resets.
+![Mozart, K.545 Excerpt][k545_chunks]
+
 
 ## Results
 
