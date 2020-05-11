@@ -10,7 +10,15 @@ discuss past work maybe?
 
 ## Our Approach
 
-comfort scores, algorithm, etc. maybe split this into subsections?
+The algorithm overview:
+1. Create table of comfort scores for a pair of notes
+2. Split each part into smaller chunks
+3. Generate potential fingerings for each chunk
+4. Stitch chunks together and find the most comfortable fingering
+
+### Comfort scores and monotonic fingering
+
+### Splitting and dynamic programming
 
 ## Results
 
