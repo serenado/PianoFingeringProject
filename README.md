@@ -79,12 +79,16 @@ Results of our algorithm are in the /results directory. Some examples of output 
 
 [k545_result]: img/k545.png
 [b_maj_result]: img/bmaj.png
+[c_maj_result]: img/cmaj.png
 
 ![B Major results][b_maj_result]
 ![Mozart, K.545 Results][k545_result]
 RH: 0.976
 LH: 0.984
 
+The algorithm will sometimes return a functional fingering but one that most piano players would not prefer to play. For example, in the C major chord shown below, the descending chunk ends in 3214321 while most piano players would mostly likely finger it as 4321321. 
+![C Major results][c_maj_result]
+The score for the C major scale is only 0.95 while the B major scale was 0.976 for the right hand.
 
 ## Future Work
 
