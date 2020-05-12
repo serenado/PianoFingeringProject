@@ -89,3 +89,15 @@ There are a lot of aspects and nuances of piano music that our algorithm does no
 	- Holding a note while playing other notes in the same hand
 	- Switching fingers while holding a long note
 	- Switch fingers while repeatedly playing a note
+
+![crazy trill][img/trill.jpg]
+*An interesting cascading trill (Chopin's Polonaise Op. 40, No. 1)*
+
+![double thumb][img/double_thumb.jpg]
+*A chord where the thumb bridges across two notes (Chopin's Prelude Op. 28, No. 20)*
+
+![finger swap][img/finger_swap.jpg]
+*Starting a note on one finger and switching to another while holding it down (Chopin's Prelude Op. 28, No. 6)*
+
+![repeated note][img/repeated.jpg]
+*Repeated notes benefit from switching fingers to maintain an even beat (Chopin's Prelude Op. 28, No. 15)*
