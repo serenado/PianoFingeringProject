@@ -79,12 +79,28 @@ Results of our algorithm are in the /results directory. Some examples of output 
 
 [k545_result]: img/k545.png
 [b_maj_result]: img/bmaj.png
+[c_maj_result]: img/cmajor.png
 
 ![B Major results][b_maj_result]
 ![Mozart, K.545 Results][k545_result]
 RH: 0.976
 LH: 0.984
 
+The algorithm will sometimes return a functional fingering but one that most piano players would not prefer to play. For example, in the C major chord shown below, the descending chunk ends in 3214321 while most piano players would mostly likely finger it as 4321321. 
+![C Major results][c_maj_result]
+The score for the C major scale is only 0.95 while the B major scale was 0.976 for the right hand.
+
+### Runtime Analysis
+The algorithm uses both BFS and a dynamic programming solution which might not be able to scale to longer scores or very long chunks. To compare runtimes, we timed execution and compared runtimes of the C major scale against the B major scale.
+
+|			| C major scale	| B major scale	|
+|-----------------------|:-------------:|:-------------:|
+| Timing (seconds)	| 4.38		| 0.40		|
+| Number of possible fingerings (one hand)	| 269542 	| 22380
+
+As shown in the table, the runtime of the algorithm is highly dependent on the number of possible fingerings found by the monotonic fingering algorithm. For the C major scale which is all white keys, there are few constraints. The number of possible fingering options is an order of magnitude greater for the C major scale than the B major scale, which makes the runtime also an order of magnitude greater.
+
+To scale the algorithm up for longer pieces and handle chunks with many fingering options, we can explore dynamic programming or pruning for monotonic fingering and think of more efficient ways of combining chunks. 
 
 ## Future Work
 
