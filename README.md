@@ -1,12 +1,10 @@
 # Piano Fingering
 
-Given a piano score, our goal for this project was to produce a reasonable fingering.
-
 ## Background
 
-put stuff about piano fingering for those who don't play piano
+The number of potential fingerings of a piano piece is exponential. A one-handed, two-octave scale alone has over 186 quintillion possibilities. Yet, despite this astronomical solution space, practiced pianists are able to intuitively generate appropriate piano fingerings, even on the fly for a piece they have never seen or heard before. 
 
-discuss past work maybe?
+When it comes to piano fingering, there generally isn't a right answer. Fingering choices can vary per pianist based on what is most comfortable for their own hands. Our task in this project was to reduce the exponential number of possible fingerings to a single fingering that would be as reasonable as possible.
 
 ## Our Approach
 
