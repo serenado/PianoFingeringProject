@@ -94,7 +94,6 @@ There are a lot of aspects and nuances of piano music that our algorithm does no
 - Rests
 	- Long enough rests serve as an opportunity for the pianist to pick up their hand and move to another area of the keyboard. There is some nuance to this as it is often more convenient to leave the hand in place. In addition, the length of the rest may correspond with how far the pianist is able to move in that time.
 - Fancy maneuvers
-	- Ornaments like trills, turns, grace notes, etc.
 	- Crossing hands over each other
 	- Playing two notes with one thumb simultaneously
 	- Holding a note while playing other notes in the same hand
