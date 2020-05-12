@@ -73,7 +73,16 @@ The solution for an entire score would be the best solution to `d[len(chunks)][j
 
 ## Results
 
-maybe highlight where our fingerings differ from actual
+Results of our algorithm are in the /results directory. Some examples of output with the corresponding normalized score are:
+
+[k545_result]: img/k545.png
+[b_maj_result]: img/bmaj.png
+
+![B Major results][b_maj_result]
+![Mozart, K.545 Results][k545_result]
+RH: 0.976
+LH: 0.984
+
 
 ## Future Work
 
