@@ -7,6 +7,7 @@ The number of potential fingerings of a piano piece is exponential. A one-handed
 When it comes to piano fingering, there generally isn't a right answer. Fingering choices can vary per pianist based on what is most comfortable for their own hands. Our task in this project was to reduce the exponential number of possible fingerings to a single fingering that would be as reasonable as possible.
 
 In piano finger notation, the convention is to number the fingers of each hand 1 to 5 from thumb to pinky, as shown in the diagram below.
+
 <img src="img/hands.jpg" height="200" align="center"/>
 
 ## Our Approach
