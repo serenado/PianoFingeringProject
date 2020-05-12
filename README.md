@@ -20,13 +20,13 @@ The algorithm overview:
 
 In order to judge whether a fingering is reasonable, our algorithm relies on a table of comfort scores. Given a pair of notes and fingers, the algorithm can lookup how comfortable on a scale from 1 to 10 that transition is. 
 
-When deciding fingering, pianists take into account many factors, but the two most important are distance between notes, and the color of the piano keys. Thus, our comfort score table has an entry for every combination of (distance, color 1, color 2, finger 1, finger 2), where distance is measured in half steps and fingers are for the right hand.
+When deciding fingering, pianists take into account many factors, but the two most important are distance between notes, and the color of the piano keys. Thus, our comfort score table has an entry for every combination of `(distance, color 1, color 2, finger 1, finger 2)`, where distance is measured in half steps and fingers are for the right hand.
 
-For example, (3, 'white', 'black', 1, 2) corresponds to the comfort score of playing a thumb on a white key, say C4, and an index finger on a black key three half steps above, say E-4.
+For example, `(3, 'white', 'black', 1, 2)` corresponds to the comfort score of playing a thumb on a white key, say C4, and an index finger on a black key three half steps above, say E-4.
 
 Note that distance is always positive, indicating an ascending interval. We assume that comfort is unaffected by direction, that is, 1 on C followed by 2 on E is as comfortable as 2 on E followed by 1 on C. We also assume symmetry between hands.
 
-Also note that finger pairings such as (3, 1) are included. This represents the thumb crossing under the middle finger.
+Also note that finger pairings such as `(3, 1)` are included. This represents the thumb crossing under the middle finger.
 
 The scores are organized as a two layer dictionary. The outer layer specifies the step size and colors of keys, and the inner layer specifies the finger pairing. If the finger pair is not included, it is deemed an unacceptable fingering and will never appear in a fingering
 produced by our algorithm. Note that this means it is possible to construct songs with no valid fingerings, if they require movements that we have deemed unacceptable.
@@ -99,14 +99,14 @@ There are a lot of aspects and nuances of piano music that our algorithm does no
 	- Switching fingers while holding a long note
 	- Switch fingers while repeatedly playing a note
 
-![crazy trill][img/trill.jpg]
+![crazy trill](img/trill.jpg)
 *An interesting cascading trill (Chopin's Polonaise Op. 40, No. 1)*
 
-![double thumb][img/double_thumb.jpg]
+![double thumb](img/double_thumb.jpg)
 *A chord where the thumb bridges across two notes (Chopin's Prelude Op. 28, No. 20)*
 
-![finger swap][img/finger_swap.jpg]
+![finger swap](img/finger_swap.jpg)
 *Starting a note on one finger and switching to another while holding it down (Chopin's Prelude Op. 28, No. 6)*
 
-![repeated note][img/repeated.jpg]
+![repeated note](img/repeated.jpg)
 *Repeated notes benefit from switching fingers to maintain an even beat (Chopin's Prelude Op. 28, No. 15)*
