@@ -218,8 +218,7 @@ def test_k545_with_split():
     result.show()
 
 
-# test_c_maj_scale()
-# test_c_maj_arpeggio()
+test_c_maj_scale()
 # test_c_maj_arpeggio()
 # test_bwv108_soprano()
 # test_k545()
