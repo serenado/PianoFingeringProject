@@ -142,23 +142,6 @@ def finger_both(score, rest_flag=-1):
 
     return annotated_score
 
-class TransitionScores:
-    def __init__(self,  chunk, rh=True):
-        self.chunk = chunk
-        self.fingerings = monotonic.finger_monotonic(self.chunk, rh)
-
-    def get_fingering_option(self, start_finger, end_finger):
-        '''
-        Gets the best fingering that starts on start_finger
-        and ends on end_finger.
-        Returns (fingering, score). If not found, returns ([], 0)
-        '''
-        for fingering, score in self.fingerings:
-            if fingering[0] == start_finger and fingering[-1] == end_finger:
-                return (fingering, score)
-
-        return ([], 0)
-
 class Transition:
     def __init__(self, note_1, note_2, rh=True, can_reset=False):
         self.note_1 = note_1
