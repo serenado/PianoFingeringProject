@@ -5,7 +5,16 @@ from music21 import *
 
 '''
 Don't use chunks.
+
+TODO:
+    - hand resets
+        - function based on rest length and transition distance
+            - if a rest is longer, you can travel further
+            - use a multiplier
+        - incorporate the comfort score of the transition without reset
 '''
+
+RESET_THRESHOLD = 7 # in half steps
 
 def get_transitions(part, rh=True, rest_flag=-1):
     '''
@@ -83,7 +92,7 @@ def finger(score, rh=True, rest_flag=-1):
         fingering, comfort_score = compute_best_comfort_score(transitions, len(transitions) - 1, j, memo_table, rh)
         if comfort_score > best_score:
             best_score = comfort_score
-            best_fingering = fingering + [j]
+            best_fingering = fingering
 
     annotated_score = monotonic.annotate_score(score, best_fingering, rh=rh)
 
@@ -91,13 +100,10 @@ def finger(score, rh=True, rest_flag=-1):
     print(best_score / (len(transitions) * 10))
     return annotated_score
 
-
 def compute_best_comfort_score(transitions, i, j, memo_table, rh=True):
     '''
     Computes best score for all transitions up to transitions[i] where transition i ends with finger j
     Returns (fingering, total score)
-
-    TODO: incorporate hand resets on long rests
     '''
     possible_fingers = [1, 2, 3, 4, 5]
 
@@ -108,8 +114,8 @@ def compute_best_comfort_score(transitions, i, j, memo_table, rh=True):
         # find best starting finger
         best_start = max(possible_fingers, key=lambda start: transition.finger_pairs.get((start, j), 0))
         score = transition.finger_pairs.get((best_start, j), -1)
-        memo_table[(i, j)] = [best_start], score
-        return ([best_start], score)
+        memo_table[(i, j)] = [best_start, j], score
+        return ([best_start, j], score)
 
     score = 0
     fingering = []
@@ -122,10 +128,15 @@ def compute_best_comfort_score(transitions, i, j, memo_table, rh=True):
             prev_fingering, prev_score = compute_best_comfort_score(transitions, i-1, f, memo_table, rh)
         possible_score = transition.finger_pairs.get((f, j), -1)
 
+        # reset hand if can_reset and distance is high enough
+        if transition.can_reset and abs(transition.distance) > RESET_THRESHOLD:
+            print('reset')
+            possible_score = 10
+
         # update
         if possible_score != -1 and prev_score + possible_score > score:
             score = prev_score + possible_score
-            fingering = prev_fingering + [f]
+            fingering = prev_fingering + [j]
 
     # store in table
     memo_table[(i, j)] = fingering, score
@@ -148,6 +159,7 @@ class Transition:
         self.note_2 = note_2
         self.rh = rh
         self.can_reset = can_reset
+        self.distance = max(min(self.note_2.pitch.ps - self.note_1.pitch.ps, 13), -13) # CLAMP DOWN TO 13
         self.finger_pairs = self.get_finger_pairs()
 
     def __repr__(self):
@@ -158,24 +170,23 @@ class Transition:
         return self.note_1.nameWithOctave + arrow + self.note_2.nameWithOctave + ' : ' + str(self.finger_pairs) + '\n'
 
     def get_finger_pairs(self):
-        distance = max(min(self.note_2.pitch.ps - self.note_1.pitch.ps, 13), -13) # CLAMP DOWN TO 13
         prev_color = monotonic.get_color(self.note_1)
         color = monotonic.get_color(self.note_2)
 
         # get valid finger pairs from the comfort score table
         if self.rh:
-            if distance >= 0:
-                finger_pairs = constants.COMFORT[(distance, prev_color, color)]
+            if self.distance >= 0:
+                finger_pairs = constants.COMFORT[(self.distance, prev_color, color)]
             else:
-                finger_pairs = constants.COMFORT[(-distance, color, prev_color)]
+                finger_pairs = constants.COMFORT[(-self.distance, color, prev_color)]
         else:
-            if distance >= 0:
-                finger_pairs = constants.COMFORT[(distance, color, prev_color)]
+            if self.distance >= 0:
+                finger_pairs = constants.COMFORT[(self.distance, color, prev_color)]
             else:
-                finger_pairs = constants.COMFORT[(-distance, prev_color, color)]
+                finger_pairs = constants.COMFORT[(-self.distance, prev_color, color)]
 
         # switch order of fingers if necessary
-        if (self.rh and distance < 0) or (not self.rh and distance >= 0):
+        if (self.rh and self.distance < 0) or (not self.rh and self.distance >= 0):
             finger_pairs = { (fingers[1], fingers[0]) : finger_pairs[fingers] for fingers in finger_pairs }
 
         return finger_pairs
@@ -221,20 +232,20 @@ def test_k545():
     result = finger_both(k545)
     result.show()
 
-def test_k545_with_split():
+def test_k545_with_resets():
     k545 = corpus.parse('mozart/k545')
-    result = finger_both(k545,rest_flag=1.0)
+    result = finger_both(k545, rest_flag=1.0)
     result.show()
 
 # test_get_transitions()
 # test_get_transitions_k545()
 
-test_c_maj_scale()
+# test_c_maj_scale()
 # test_b_maj_scale()
 # test_c_maj_arpeggio()
 # test_bwv108_soprano()
 # test_k545()
-# test_k545_with_split()
+test_k545_with_resets()
 
 
 
