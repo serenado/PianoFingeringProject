@@ -2,6 +2,8 @@
 
 Update (5/16/2020): In the branch named `clairet`, the file `finger_v2.py` implements a more efficient algorithm that forgos "chunks" completely and uses dynamic programming on individual notes instead. This results in much faster runtimes (by a factor of about 5-10) and fingerings that are optimized over all notes, whereas the previous algorithm gave more weight to shorter chunks.
 
+Update (5/17/2020): The new algorithm also incorporates hand resets when there is a long enough rest between notes and also a long enough distance (> 7 half steps). In the future, a more complex method could be implemented to determine when hand resets should occur. For instance, longer rests should allow for the hand to travel a larger distance.
+
 ## Background
 
 The number of potential fingerings of a piano piece is exponential. A one-handed, two-octave scale alone has over 186 quintillion possibilities. Yet, despite this astronomical solution space, practiced pianists are able to intuitively generate appropriate piano fingerings, even on the fly for a piece they have never seen or heard before. 
